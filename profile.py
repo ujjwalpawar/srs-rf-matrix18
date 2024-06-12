@@ -39,7 +39,7 @@ NODE_IDS = {
     "sdru": "x310-1",
     "uemon": "n300-2",
     "ue": "nuc27",
-    "rumon": "n310-1",
+    "rumon": "n300-1",
 }
 MATRIX_GRAPH = {
     "sdru": ["ue", "rumon"],
