@@ -20,14 +20,14 @@ if [ -z $DST_RU ]; then
   usage; exit 1
 fi
 
-if [ $DST_RU != "bru1" ] && [ $DST_RU != "bru2" ]; then
+if [ $DST_RU != "ru1" ] && [ $DST_RU != "ru2" ]; then
   echo "invalid dst_ru"; usage; exit 1
 fi
 
-if [ $DST_RU == "bru1" ]; then
-  SRC_RU="bru2"
+if [ $DST_RU == "ru1" ]; then
+  SRC_RU="ru2"
 else
-  SRC_RU="bru1"
+  SRC_RU="ru1"
 fi
 
 handover() {
