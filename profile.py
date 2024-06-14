@@ -177,6 +177,9 @@ node_sdr_if.addAddress(pg.IPv4Address("192.168.20.1", "255.255.255.0"))
 sdr_link = request.Link("{}-sdr-link".format(node_name))
 sdr_link.bandwidth = 10*1000*1000
 sdr_link.addInterface(node_sdr_if)
+uemncmp.addService(pg.Execute(shell="bash", command="/local/repository/bin/tune-sdr-iface.sh"))
+uemncmp.addService(pg.Execute(shell="bash", command="/local/repository/bin/deploy-gnuradio.sh"))
+uemncmp.addService(pg.Execute(shell="bash", command="/local/repository/bin/update-attens uemon 0"))
 
 node_name = "uemon"
 uemon = request.RawPC("{}-sdr".format(node_name))
@@ -198,6 +201,10 @@ node_sdr_if.addAddress(pg.IPv4Address("192.168.20.1", "255.255.255.0"))
 sdr_link = request.Link("{}-sdr-link".format(node_name))
 sdr_link.bandwidth = 10*1000*1000
 sdr_link.addInterface(node_sdr_if)
+rumncmp.addService(pg.Execute(shell="bash", command="/local/repository/bin/tune-sdr-iface.sh"))
+rumncmp.addService(pg.Execute(shell="bash", command="/local/repository/bin/deploy-gnuradio.sh"))
+rumncmp.addService(pg.Execute(shell="bash", command="/local/repository/bin/update-attens rumon 0"))
+
 
 node_name = "rumon"
 rumon = request.RawPC("{}-sdr".format(node_name))
