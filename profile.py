@@ -63,58 +63,6 @@ for k, v in MATRIX_GRAPH.items():
             RF_LINK_NAMES["rflink_{}_{}".format(k, node)].append(RF_IFACES[k][node])
             RF_LINK_NAMES["rflink_{}_{}".format(k, node)].append(RF_IFACES[node][k])
 
-def sdr_node_pair(role, sdr_id):
-    node = request.RawPC("{}-{}-comp".format(sdr_id, role))
-    node.component_manager_id = COMP_MANAGER_ID
-    if role == "gnb":
-        node.hardware_type = params.sdru_nodetype
-    else:
-        node.hardware_type = params.mon_nodetype
-
-    if params.sdr_compute_image:
-        node.disk_image = params.sdr_compute_image
-    else:
-        node.disk_image = UBUNTU_IMG
-
-    node_radio_if = node.addInterface("usrp_if")
-    if role == "gnb":
-        ipaddr = "192.168.40.1"
-    else:
-        ipaddr = "192.168.20.1"
-
-    node_radio_if.addAddress(pg.IPv4Address(ipaddr, "255.255.255.0"))
-
-    radio_link = request.Link("sdr_id-link-{}".format(role))
-    radio_link.bandwidth = 10*1000*1000
-    radio_link.addInterface(node_radio_if)
-
-    sdr = request.RawPC("{}-{}-sdr".format(sdr_id, role))
-    sdr.component_id = sdr_id
-    sdr.component_manager_id = COMP_MANAGER_ID
-    radio_link.addNode(sdr)
-
-    if params.srsran_commit_hash:
-        srsran_hash = params.srsran_commit_hash
-    else:
-        srsran_hash = DEFAULT_SRSRAN_HASH
-
-    if role == "gnb":
-        nodeb_cn_if = node.addInterface("nodeb-cn-if")
-        nodeb_cn_if.addAddress(pg.IPv4Address("192.168.1.2", "255.255.255.0"))
-        cn_link.addInterface(nodeb_cn_if)
-        cmd = "{} '{}'".format(SRSRAN_DEPLOY_SCRIPT, srsran_hash)
-        node.addService(pg.Execute(shell="bash", command=cmd))
-        node.addService(pg.Execute(shell="bash", command="/local/repository/bin/tune-cpu.sh"))
-        node.addService(pg.Execute(shell="bash", command="/local/repository/bin/tune-sdr-iface.sh"))
-
-def b210_nuc_pair(b210_node):
-    node = request.RawPC("{}-cots-ue".format(b210_node))
-    node.component_manager_id = COMP_MANAGER_ID
-    node.component_id = b210_node
-    node.disk_image = COTS_UE_IMG
-    node.addService(pg.Execute(shell="bash", command="/local/repository/bin/module-off.sh"))
-    node.addService(pg.Execute(shell="bash", command="/local/repository/bin/update-udhcpc-script.sh"))
-
 pc = portal.Context()
 node_types = [
     ("d430", "Emulab, d430"),
@@ -195,7 +143,7 @@ cudu_cn_if = cudu.addInterface("{}-cn-if".format(node_name))
 cudu_cn_if.addAddress(pg.IPv4Address("192.168.1.2", "255.255.255.0"))
 cn_link.addInterface(cudu_cn_if)
 node_sdr_if = cudu.addInterface("usrp_if")
-node_sdr_if.addAddress(pg.IPv4Address("192.168.40.1", "255.255.255.0"))
+node_sdr_if.addAddress(pg.IPv4Address("192.168.30.1", "255.255.255.0"))
 sdr_link = request.Link("{}-sdr-link".format(node_name))
 sdr_link.bandwidth = 10*1000*1000
 sdr_link.addInterface(node_sdr_if)
