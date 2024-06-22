@@ -170,7 +170,7 @@ if params.sdr_compute_image:
 else:
     uemncmp.disk_image = UBUNTU_IMG
 node_sdr_if = uemncmp.addInterface("{}-sdr-if".format(node_name))
-node_sdr_if.addAddress(pg.IPv4Address("192.168.20.1", "255.255.255.0"))
+node_sdr_if.addAddress(pg.IPv4Address("192.168.10.1", "255.255.255.0"))
 sdr_link = request.Link("{}-sdr-link".format(node_name))
 sdr_link.bandwidth = 10*1000*1000
 sdr_link.addInterface(node_sdr_if)
@@ -194,7 +194,7 @@ if params.sdr_compute_image:
 else:
     rumncmp.disk_image = UBUNTU_IMG
 node_sdr_if = rumncmp.addInterface("{}-sdr-if".format(node_name))
-node_sdr_if.addAddress(pg.IPv4Address("192.168.20.1", "255.255.255.0"))
+node_sdr_if.addAddress(pg.IPv4Address("192.168.10.1", "255.255.255.0"))
 sdr_link = request.Link("{}-sdr-link".format(node_name))
 sdr_link.bandwidth = 10*1000*1000
 sdr_link.addInterface(node_sdr_if)
