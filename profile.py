@@ -124,9 +124,6 @@ cn_link = request.Link("{}-link".format(role))
 cn_link.setNoBandwidthShaping()
 cn_link.addInterface(cn_if)
 cn_node.addService(pg.Execute(shell="bash", command=OPEN5GS_DEPLOY_SCRIPT))
-cn_node.addService(pg.Execute(shell="bash", command="/local/repository/bin/install-improved-iperf3.sh"))
-cn_node.addService(pg.Execute(shell="bash", command="/local/repository/bin/start-iperf.sh"))
-cn_node.addService(pg.Execute(shell="bash", command="/local/repository/bin/install-vsftpd.sh.sh"))
 
 # collect node objects for RF matrix
 matrix_nodes = {}

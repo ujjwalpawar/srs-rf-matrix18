@@ -67,9 +67,4 @@ else
 fi
 echo configuring nodeb... done.
 
-sudo cp $SERVICESDIR/srs-gnb.service /etc/systemd/system/srs-gnb.service
-sudo cp $SERVICESDIR/srs-gnb-metrics.service /etc/systemd/system/srs-gnb-metrics.service
-sudo systemctl daemon-reload
-sudo cp $BINDIR/metrics-receiver.py $SRCDIR
-
 touch $SRCDIR/srs-setup-complete
