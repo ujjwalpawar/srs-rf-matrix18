@@ -67,9 +67,9 @@ In aother session on the `ue` node, bring the COTS UE out of airplane mode:
 
 At this point the UE should attach to the gNB via the first DU/RU pair. (This
 profile initializes the state of the programmable attenuators such that the
-paths between DU/RU #1 and the COTS UE have the minimum attenuation, while the
-paths terminating at DU/RU #2 have the maximum attenuation.) The physical cell
-ID (PCI) for this DU/RU pair is 1, as indicated in the output of the srsRAN gNB
+paths between DU/RU 1 and the COTS UE have the minimum attenuation, while the
+paths terminating at DU/RU 2 have the maximum attenuation.) The physical cell ID
+(PCI) for this DU/RU pair is 1, as indicated in the output of the srsRAN gNB
 process...
 
 ```
@@ -93,9 +93,9 @@ ping 10.45.0.1
 
 Now that there is some traffic being generated, lets trigger an intra-gNB
 handover by incrementally adjusting the attenuations such that the paths between
-DU/RU #1 and the UE become more attenuated, while the paths terminating at CU/DU
-#2 become less attenuated, eventully resulting in a higher quality channel
-between the UE and DU/RU #2. You can use the included helper script to do this:
+DU/RU 1 and the UE become more attenuated, while the paths terminating at CU/DU
+2 become less attenuated, eventully resulting in a higher quality channel
+between the UE and DU/RU 2. You can use the included helper script to do this:
 
 ```
 # on any node in the experiment

@@ -28,6 +28,7 @@ sudo apt-get install -y \
   libsctp-dev \
   libyaml-cpp-dev \
   libgtest-dev \
+  numactl \
   ppp
 
 cd $SRCDIR
