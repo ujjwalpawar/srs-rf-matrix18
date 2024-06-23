@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 UPDATE_ATTENS_SCRIPT=/local/repository/bin/update-attens
 DST_RU=$1
 ATTEN_STEP=5
@@ -25,16 +25,18 @@ if [ $DST_RU != "ru1" ] && [ $DST_RU != "ru2" ]; then
 fi
 
 if [ $DST_RU == "ru1" ]; then
-  SRC_RU="ru2"
+  DST_RU_GROUP="ru1ue"
+  SRC_RU_GROUP="ru2ue"
 else
-  SRC_RU="ru1"
+  DST_RU_GROUP="ru2ue"
+  SRC_RU_GROUP="ru1ue"
 fi
 
 handover() {
   echo "handing over UE to $TARGET_RU..."
   for atten in $(seq $START_ATTEN_SRC $ATTEN_STEP $START_ATTEN_DST); do
-    $UPDATE_ATTENS_SCRIPT $SRC_RU $((START_ATTEN_SRC + atten))
-    $UPDATE_ATTENS_SCRIPT $DST_RU $((START_ATTEN_DST - atten))
+    $UPDATE_ATTENS_SCRIPT $SRC_RU_GROUP $((START_ATTEN_SRC + atten))
+    $UPDATE_ATTENS_SCRIPT $DST_RU_GROUP $((START_ATTEN_DST - atten))
   done
 }
 
