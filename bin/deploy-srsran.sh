@@ -22,6 +22,7 @@ sudo apt-get install -y \
   g++ \
   iperf3 \
   pkg-config \
+  libboost-dev \
   libfftw3-dev \
   libmbedtls-dev \
   libsctp-dev \
