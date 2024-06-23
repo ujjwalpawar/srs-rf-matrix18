@@ -10,20 +10,127 @@ import geni.rspec.emulab as emulab
 
 
 tourDescription = """
-### srsRAN 5G using the POWDER RF Attenuator Matrix
+### srsRAN 5G Handover using the Programmable Attenuator Matrix
 
-This profile instantiates an experiment for running srsRAN_Project 5G with a COTS
-UE and/or SDR UE.
+This profile instantiates a 5G network with srsRAN and Open5GS on POWDER in a
+conducted RF evironment with programmable attenuators for emulating handover
+scenarios.
 
 The following will be deployed:
+- Open5GS CN node (Dell R430)
+- srsRAN CU/DU node (Dell R740 + USRP X310 w/ 2x UBX-160 daughter cards)
+  - the two daughter cards will be used for separate DU/RU pairs and intra-gNB handover
+- DL monitoring node (Dell R430 + USRP N300)
+- UL monitoring node (Dell R430 + USRP N300)
+- UE node (Intel NUC w/ COTS UE)
 
 """
 
 tourInstructions = """
 
-Startup scripts will still be running when your experiment becomes ready.
-Watch the "Startup" column on the "List View" tab for your experiment and wait
-until all of the compute nodes show "Finished" before proceeding.
+Startup scripts will still be running when your experiment becomes ready. Watch
+the "Startup" column on the "List View" tab for your experiment and wait until
+all of the compute nodes show "Finished" before proceeding.
+
+Once the experiment is ready, you can log into the Open5GS CN node (`cn5g`) and
+monitor the AMF and SMF logs:
+
+```
+# on the cn5g node
+sudo journalctl -u open5gs-amfd -u open5gs-smfd -f --output cat
+```
+
+Next, in a session on the srsRAN Project CU/DU node (`cudu`), start the srsRAN
+gNB:
+
+```
+# on the cudu node
+sudo numactl --membind 0 --cpubind 0 \
+  /var/tmp/srsRAN_Project/build/apps/gnb/gnb -c /var/tmp/etc/srsran/gnb_rf_x310_ho.yml \
+  -c /var/tmp/etc/srsran/slicing.yml
+```
+
+In a session on the `ue` node, start the UE connection manager with the target
+DNN `internet` in `ipv4` mode:
+
+```
+# on the ue node
+sudo quectel-CM -s internet -4
+```
+
+In aother session on the `ue` node, bring the COTS UE out of airplane mode:
+
+```
+# on the ue node
+/local/repository/bin/module-on.sh
+```
+
+At this point the UE should attach to the gNB via the first DU/RU pair. (This
+profile initializes the state of the programmable attenuators such that the
+paths between DU/RU #1 and the COTS UE have the minimum attenuation, while the
+paths terminating at DU/RU #2 have the maximum attenuation.) The physical cell
+ID (PCI) for this DU/RU pair is 1, as indicated in the output of the srsRAN gNB
+process...
+
+```
+# output of srsran gnb process on cudu node
+          |--------------------DL---------------------|-------------------------UL------------------------------
+ pci rnti | cqi  ri  mcs  brate   ok  nok  (%)  dl_bs | pusch  rsrp  mcs  brate   ok  nok  (%)    bsr    ta  phr
+   1 4604 |  15   1   27   4.8k    5    0   0%      0 |  37.5  -5.0   28    17k    4    0   0%      0   0us   24
+   1 4604 |  15   1   28   4.2k    4    0   0%      0 |  37.9  -5.0   28    13k    3    0   0%      0   0us   24
+   1 4604 |  15   1   27   4.8k    5    0   0%      0 |  35.8  -4.9   28    17k    4    0   0%      0   0us   24
+   1 4604 |  15   1   27   4.8k    5    0   0%      0 |  36.8  -5.1   28    17k    4    0   0%      0   0us   24
+   1 4604 |  15   1   27   4.8k    5    0   0%      0 |  36.3  -5.0   28    22k    5    0   0%      0   0us   24
+```
+
+In a session on the `ue` node, start a ping process pointed at the core network
+UPF, so we can verify that traffic still passes throughout the handover process:
+
+```
+# on ue node
+ping 10.45.0.1
+```
+
+Now that there is some traffic being generated, lets trigger an intra-gNB
+handover by incrementally adjusting the attenuations such that the paths between
+DU/RU #1 and the UE become more attenuated, while the paths terminating at CU/DU
+#2 become less attenuated, eventully resulting in a higher quality channel
+between the UE and DU/RU #2. You can use the included helper script to do this:
+
+```
+# on any node in the experiment
+/local/repository/bin/handover ru2
+```
+
+You should see the PCI for the attached UE change to 2 in the output of the gNB
+process, indicating a handover to DU/RU...
+
+```
+          |--------------------DL---------------------|-------------------------UL------------------------------
+ pci rnti | cqi  ri  mcs  brate   ok  nok  (%)  dl_bs | pusch  rsrp  mcs  brate   ok  nok  (%)    bsr    ta  phr
+   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  35.9  -3.0   28    17k    4    0   0%      0   n/a   24
+   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  36.5  -4.0   28    17k    4    0   0%      0   n/a   24
+   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  37.0  -4.0   28    17k    4    0   0%      0   n/a   24
+   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  36.6  -4.0   28    17k    4    0   0%      0   n/a   24
+   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  37.0  -4.0   28    17k    4    0   0%      0   n/a   24
+   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  36.4  -4.0   28    17k    4    0   0%      0   n/a   24
+```
+
+...while the ping traffic continues uninterrupted. You can trigger a handover back to DU/RU #1 if you like:
+
+```
+# on any node in the experiment
+/local/repository/bin/handover ru1
+```
+
+The `rumncmp` and `uemncmp` nodes and acompanying SDRs are included to allow for, e.g.:
+
+- realtime monitoring of 5G transmissions
+- injecting interference in the DL or UL paths
+- recording samples of DL and/or UL transmissions for data gathering purposes
+
+GnuRadio and UHD tools are installed on these nodes.
+
 
 """
 
