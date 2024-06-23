@@ -62,7 +62,7 @@ cu_cp:
         a3_time_to_trigger_ms: 100
 
 log:
-  all_level: warning
+  all_level: info
   rrc_level: debug
 
 pcap:
@@ -70,9 +70,6 @@ pcap:
   mac_filename: /tmp/gnb_mac.pcap
   ngap_enable: true
   ngap_filename: /tmp/gnb_ngap.pcap
-  f1ap_enable: true
-  f1ap_filename: /tmp/gnb_f1ap.pcap
-  gtpu_enable: true
-  gtpu_filename: /tmp/gnb_gtpu.pcap
-  e1ap_enable: true
-  e1ap_filename: /tmp/gnb_e1ap.pcap
+
+metrics:
+  autostart_stdout_metrics: true
