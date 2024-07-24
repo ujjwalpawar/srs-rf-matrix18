@@ -36,8 +36,12 @@ set_paths() {
     echo "done!"
 }
 
-if [ $# -lt 1 ]; then
+if [ "$1" == "-h" ]; then
     usage; exit 0
+fi
+
+if [ $# -lt 1 ]; then
+    usage; exit 1
 fi
 
 if [ $# -gt 2 ]; then
