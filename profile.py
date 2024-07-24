@@ -13,13 +13,12 @@ tourDescription = """
 ### srsRAN 5G Handover using the Programmable Attenuator Matrix
 
 This profile instantiates a 5G network with srsRAN and Open5GS on POWDER in a
-conducted RF evironment with programmable attenuators for emulating handover
-scenarios.
+conducted RF evironment with programmable attenuators for emulating different
+channel conditions.
 
 The following will be deployed:
 - Open5GS CN node (Dell R430)
 - srsRAN CU/DU node (Dell R740 + USRP X310 w/ 2x UBX-160 daughter cards)
-  - the two daughter cards will be used for separate DU/RU pairs and intra-gNB handover
 - DL monitoring node (Dell R430 + USRP N300)
 - UL monitoring node (Dell R430 + USRP N300)
 - UE node (Intel NUC w/ COTS UE)
@@ -46,7 +45,7 @@ gNB:
 ```
 # on the cudu node
 sudo numactl --membind 0 --cpubind 0 \
-  /var/tmp/srsRAN_Project/build/apps/gnb/gnb -c /var/tmp/etc/srsran/gnb_rf_x310_ho.yml \
+  /var/tmp/srsRAN_Project/build/apps/gnb/gnb -c /var/tmp/etc/srsran/gnb_rf_x310.yml \
   -c /var/tmp/etc/srsran/slicing.yml
 ```
 
@@ -65,12 +64,7 @@ In aother session on the `ue` node, bring the COTS UE out of airplane mode:
 /local/repository/bin/module-on.sh
 ```
 
-At this point the UE should attach to the gNB via the first DU/RU pair. (This
-profile initializes the state of the programmable attenuators such that the
-paths between DU/RU 1 and the COTS UE have the minimum attenuation, while the
-paths terminating at DU/RU 2 have the maximum attenuation.) The physical cell ID
-(PCI) for this DU/RU pair is 1, as indicated in the output of the srsRAN gNB
-process...
+At this point the UE should attach to the gNB...
 
 ```
 # output of srsran gnb process on cudu node
@@ -91,37 +85,17 @@ UPF, so we can verify that traffic still passes throughout the handover process:
 ping 10.45.0.1
 ```
 
-Now that there is some traffic being generated, lets trigger an intra-gNB
-handover by incrementally adjusting the attenuations such that the paths between
-DU/RU 1 and the UE become more attenuated, while the paths terminating at CU/DU
-2 become less attenuated, eventully resulting in a higher quality channel
-between the UE and DU/RU 2. You can use the included helper script to do this:
+Now that there is some traffic being generated, we can adjust the attenuation on
+the paths between the gNB and UE to simulate a degraded channel:
 
 ```
 # on any node in the experiment
-/local/repository/bin/handover ru2
+# this command will add 5 dB of attenuation to the path between the gNB and UE
+/local/repository/bin/update-attens ru1ue 5
 ```
 
-You should see the PCI for the attached UE change to 2 in the output of the gNB
-process, indicating a handover to DU/RU...
-
-```
-          |--------------------DL---------------------|-------------------------UL------------------------------
- pci rnti | cqi  ri  mcs  brate   ok  nok  (%)  dl_bs | pusch  rsrp  mcs  brate   ok  nok  (%)    bsr    ta  phr
-   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  35.9  -3.0   28    17k    4    0   0%      0   n/a   24
-   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  36.5  -4.0   28    17k    4    0   0%      0   n/a   24
-   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  37.0  -4.0   28    17k    4    0   0%      0   n/a   24
-   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  36.6  -4.0   28    17k    4    0   0%      0   n/a   24
-   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  37.0  -4.0   28    17k    4    0   0%      0   n/a   24
-   2 5601 |  15   1   27   4.7k    5    0   0%      0 |  36.4  -4.0   28    17k    4    0   0%      0   n/a   24
-```
-
-...while the ping traffic continues uninterrupted. You can trigger a handover back to DU/RU #1 if you like:
-
-```
-# on any node in the experiment
-/local/repository/bin/handover ru1
-```
+You can continue to add more attenuation and witness the effects on the metrics
+being output by the gNB process.
 
 The `rumncmp` and `uemncmp` nodes and acompanying SDRs are included to allow for, e.g.:
 
@@ -130,7 +104,6 @@ The `rumncmp` and `uemncmp` nodes and acompanying SDRs are included to allow for
 - recording samples of DL and/or UL transmissions for data gathering purposes
 
 GnuRadio and UHD tools are installed on these nodes.
-
 
 """
 
