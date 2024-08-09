@@ -28,7 +28,8 @@ sudo apt install -y \
     mongodb-mongosh \
     nginx \
     tshark \
-    wireshark
+    wireshark \
+    iperf3
 
 sudo systemctl start mongod
 sudo systemctl enable mongod
