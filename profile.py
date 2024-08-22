@@ -136,7 +136,7 @@ GnuRadio and UHD tools are installed on these nodes.
 
 BIN_PATH = "/local/repository/bin"
 ETC_PATH = "/local/repository/etc"
-UBUNTU_IMG = "urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU22-64-STD"
+UBUNTU_IMG = "urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU18-64-STD"
 COTS_UE_IMG = "urn:publicid:IDN+emulab.net+image+PowderTeam:cots-jammy-image"
 COMP_MANAGER_ID = "urn:publicid:IDN+emulab.net+authority+cm"
 DEFAULT_SRSRAN_HASH = "a15950301c5f3a1a166b79bb6c9ee901a4e8c2dd"
